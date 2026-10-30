@@ -1,0 +1,32 @@
+# Raw data and cached embeddings: large, re-downloadable / regenerable
+data/
+feats/
+*.npy
+*.npz
+
+# Model weights / caches
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+.cache/
+hf_cache/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
