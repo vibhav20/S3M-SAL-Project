@@ -4,6 +4,9 @@ feats/
 *.npy
 *.npz
 
+# Token pair lists: ~73 MB, regenerate with scripts/02_build_pairs.py (~6 min)
+tables/pairs_*.csv
+
 # Model weights / caches
 *.pt
 *.pth
