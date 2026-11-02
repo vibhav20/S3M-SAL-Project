@@ -83,7 +83,49 @@ The speaker shows up in the experiments in two ways:
    closer than synonyms here, the finding is about sound vs. meaning, not about who spoke.
    These runs have no same-speaker pair type, since every pair is from the same speaker.
 
-## 6. Caveats
+## 6. Output tables and how they connect
+
+```
+librispeech_words.csv     every usable spoken word (70,746 rows), with phones + synonyms
+        │  seed picks 10,000 rows (or: all rows of one speaker)
+        ▼
+sample_{run}.csv          a subset of librispeech_words.csv, same columns, same row_ids
+        │  compare the distinct words in the sample (no randomness here)
+        ▼
+wordmap_{run}.csv         which WORDS are related:  "ability ~ power"  (synonym)
+        │  expand every related word pair into all its audio clips, add the other 3 types
+        ▼
+pairs_{run}.csv           which CLIPS to compare:   row 45168 ("i") vs row 42608 ("one")
+```
+
+`{run}` is `seed0` … `seed4` or `spk5142`, `spk2412`, ….
+
+| Table | Step | One row is | Randomness | Example |
+|---|---|---|---|---|
+| `librispeech_words.csv` | 01 | one spoken word token (a word at one moment in one recording) | none | "i", speaker 237, 1.89–2.00 s of 237-126133-0022 |
+| `sample_{run}.csv` | 02 | a token picked for this run | **the seed** chooses the 10,000 tokens | same columns and `row_id` as the word table |
+| `wordmap_{run}.csv` | 02 | two related **words** | none: same sample → same word map | `ability, power, synonym`; `abashed, attached, homophone` |
+| `pairs_{run}.csv` | 02 | two **audio clips** to compare (by `row_id`) | shuffles for random / same-speaker / same-word (seed 42) | `synonym, 45168, 42608, i, one` |
+
+- **`row_id`** is the permanent ID of a token in `librispeech_words.csv`; every later table refers
+  to tokens by it, so a pair can always be traced back to its audio file and start/end time.
+- **Why sample?** Feature extraction runs on 10k clips instead of 70k, and 5 seeds give 5
+  independent samples, so results are reported as a mean over seeds rather than one lucky draw.
+- **Word map vs. pairs.** The word map only says which *words* are related. A word occurs many
+  times in the sample (different sentences and speakers), so one word-map row expands into many
+  clip pairs: "i ~ one" becomes every *i* clip × every *one* clip. Hence ~7k synonym word pairs
+  but ~236k synonym clip pairs per seed.
+- **Pair types without a word map** come straight from the sample: random (shuffle all tokens),
+  same speaker (shuffle within each speaker), same word (shuffle within each word).
+
+How the next steps use them:
+
+- **Features (step 03):** for every row of `sample_{run}.csv`, cut `audio_path` from `start` to
+  `end`, run the model, save one vector per layer under its `row_id`.
+- **Similarity (step 04):** for every row of `pairs_{run}.csv`, look up both vectors by `row_id`,
+  compute cosine similarity per layer, average per word pair, then per pair type.
+
+## 7. Caveats
 
 **Choices copied from the authors (kept so our results are comparable):**
 
