@@ -115,6 +115,10 @@ pairs_{run}.csv           which CLIPS to compare:   row 45168 ("i") vs row 42608
   times in the sample (different sentences and speakers), so one word-map row expands into many
   clip pairs: "i ~ one" becomes every *i* clip × every *one* clip. Hence ~7k synonym word pairs
   but ~236k synonym clip pairs per seed.
+- **Pair files in git.** The 10 `pairs_*.csv` (73 MB) are gitignored; a zipped copy,
+  `tables/pairs.zip` (14 MB), is committed. Unzip from the project root with
+  `unzip tables/pairs.zip`, or regenerate with `python scripts/02_build_pairs.py`. If the pairs
+  are ever rebuilt, refresh the zip: `rm tables/pairs.zip && zip -9 tables/pairs.zip tables/pairs_*.csv`.
 - **Pair types without a word map** come straight from the sample: random (shuffle all tokens),
   same speaker (shuffle within each speaker), same word (shuffle within each word).
 
