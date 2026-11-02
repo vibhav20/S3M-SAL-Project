@@ -33,3 +33,6 @@ env/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Personal notes, not for the GitHub repo
+local_README.md
